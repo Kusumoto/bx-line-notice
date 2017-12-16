@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"gitlab.kusumotolab.com/kusumoto/bx-line-notice/config"
+	"github.com/kusumoto/bx-line-notice/config"
 
 	"github.com/spf13/viper"
 )
