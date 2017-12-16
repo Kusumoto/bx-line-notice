@@ -100,7 +100,7 @@ func compareDataFromAPIAndCache(correctItem *BxJSONObject) []string {
 					" \n🚂 Change : New ➡️ " + strconv.FormatFloat(result.NewValue.Change, 'f', -1, 64) +
 					" Old ➡️ " + strconv.FormatFloat(result.OldValue.Change, 'f', -1, 64) +
 					" \n✈️ Last Price : New ➡️ " + strconv.FormatFloat(result.NewValue.LastPrice, 'f', -1, 64) +
-					" Old ➡️ " + strconv.FormatFloat(result.OldValue.LastPrice, 'f', -1, 64) +
+					" Old ➡️ " + strconv.FormatFloat(result.OldValue.LastPrice, 'f', -1, 64))
 				stringCollections = append(stringCollections, stringBuffer.String())
 			}
 		}
