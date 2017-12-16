@@ -80,8 +80,8 @@ func firstReporter(correctItem *BxJSONObject) []string {
 		stringBuffer.WriteString("\n")
 		stringBuffer.WriteString(bxItem.PrimaryCurrency +
 			" 👉🏻 " + bxItem.SecondaryCurrency +
-			" 🚂 Change : " + strconv.FormatFloat(bxItem.Change, 'f', -1, 64) +
-			" 💎 Last Price : " + strconv.FormatFloat(bxItem.LastPrice, 'f', -1, 64))
+			" \n🚂 Change : " + strconv.FormatFloat(bxItem.Change, 'f', -1, 64) +
+			" \n💎 Last Price : " + strconv.FormatFloat(bxItem.LastPrice, 'f', -1, 64))
 		stringCollections = append(stringCollections, stringBuffer.String())
 	}
 	return stringCollections
@@ -94,13 +94,13 @@ func compareDataFromAPIAndCache(correctItem *BxJSONObject) []string {
 		if result.OldValue.PairingID == result.NewValue.PairingID {
 			if result.OldValue.LastPrice > result.NewValue.LastPrice {
 				var stringBuffer bytes.Buffer
-				stringBuffer.WriteString("\n")
+				stringBuffer.WriteString("\n\n")
 				stringBuffer.WriteString(result.NewValue.PrimaryCurrency +
 					" 👉🏻 " + result.NewValue.SecondaryCurrency +
-					" 🚂 Change : New ➡️ " + strconv.FormatFloat(result.NewValue.Change, 'f', -1, 64) +
+					" \n🚂 Change : New ➡️ " + strconv.FormatFloat(result.NewValue.Change, 'f', -1, 64) +
 					" Old ➡️ " + strconv.FormatFloat(result.OldValue.Change, 'f', -1, 64) +
-					" ✈️ Last Price : New ➡️ " + strconv.FormatFloat(result.NewValue.LastPrice, 'f', -1, 64) +
-					" Old ➡️ " + strconv.FormatFloat(result.OldValue.LastPrice, 'f', -1, 64))
+					" \n✈️ Last Price : New ➡️ " + strconv.FormatFloat(result.NewValue.LastPrice, 'f', -1, 64) +
+					" Old ➡️ " + strconv.FormatFloat(result.OldValue.LastPrice, 'f', -1, 64) +
 				stringCollections = append(stringCollections, stringBuffer.String())
 			}
 		}
