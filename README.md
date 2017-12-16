@@ -10,7 +10,8 @@ Compare and notice price cryptocurrency from bx.in.th to line
     "BXAPIUrl": "https://bx.in.th/api/",
     "LineAccessToken": "",
     "HTTPTimeout": 10,
-    "Delay": 5
+    "Delay": 5,
+    "ReplaceLastData": false
 }
 ```
 - Run via docker use command
