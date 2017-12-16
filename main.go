@@ -17,7 +17,7 @@ import (
 )
 
 var myClient = &http.Client{Timeout: 10 * time.Second}
-var cacheAPI = []BxJSONStructure{}
+var cacheAPI = new([]BxJSONStructure)
 var setDelay time.Duration = 5
 var replaceLastData = false
 
@@ -67,7 +67,8 @@ func getJSON(url string, target interface{}) error {
 }
 
 func compareNewOrderAndCacheOrder(correctItem []BxJSONStructure) {
-	if len(cacheAPI) == 0 {
+	fmt.Println(len(*cacheAPI))
+	if len(*cacheAPI) == 0 {
 		splitTextBeforeSendToLine(firstReporter(correctItem))
 	} else {
 		splitTextBeforeSendToLine(compareDataFromAPIAndCache(correctItem))
@@ -112,7 +113,7 @@ func compareDataFromAPIAndCache(correctItem []BxJSONStructure) []string {
 func cacheDataAndAPIMapper(correctItem []BxJSONStructure) []DiffModel {
 	var compareResult = []DiffModel{}
 	for _, bxItem := range correctItem {
-		for _, bxCacheItem := range cacheAPI {
+		for _, bxCacheItem := range *cacheAPI {
 			if bxItem.PairingID == bxCacheItem.PairingID {
 				var resultItem = DiffModel{OldValue: bxCacheItem, NewValue: bxItem}
 				compareResult = append(compareResult, resultItem)
@@ -172,7 +173,7 @@ func readConfig() {
 func replaceLowerData(correctItem []BxJSONStructure) []BxJSONStructure {
 	var tempCache = []BxJSONStructure{}
 	for _, bxItem := range correctItem {
-		for _, bxCacheItem := range cacheAPI {
+		for _, bxCacheItem := range *cacheAPI {
 			if bxItem.PairingID == bxCacheItem.PairingID && bxCacheItem.LastPrice > bxItem.LastPrice {
 				tempCache = append(tempCache, bxItem)
 			} else if bxItem.PairingID == bxCacheItem.PairingID {
@@ -200,12 +201,16 @@ func main() {
 			log.Fatal(err)
 			fmt.Println(err.Error())
 		}
-		var bxFinalOpject = bxObjectConverter(correctObj)
-		compareNewOrderAndCacheOrder(bxFinalOpject)
+		var bxFinalObject = bxObjectConverter(correctObj)
+		compareNewOrderAndCacheOrder(bxFinalObject)
 		if replaceLastData {
-			cacheAPI = bxFinalOpject
+			*cacheAPI = bxFinalObject
 		} else {
-			cacheAPI = replaceLowerData(bxFinalOpject)
+			if len(*cacheAPI) == 0 {
+				*cacheAPI = bxFinalObject
+			} else {
+				*cacheAPI = replaceLowerData(bxFinalObject)
+			}
 		}
 		time.Sleep(setDelay * 1000 * time.Millisecond)
 	}
