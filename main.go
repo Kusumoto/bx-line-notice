@@ -17,8 +17,9 @@ import (
 )
 
 var myClient = &http.Client{Timeout: 10 * time.Second}
-var cacheAPI = new(BxJSONObject)
+var cacheAPI = []BxJSONStructure{}
 var setDelay time.Duration = 5
+var replaceLastData = false
 
 var bxAPI = ""
 var lineAccessToken = ""
@@ -65,17 +66,17 @@ func getJSON(url string, target interface{}) error {
 	return json.NewDecoder(r.Body).Decode(target)
 }
 
-func compareNewOrderAndCacheOrder(correctItem *BxJSONObject) {
-	if len(*cacheAPI) == 0 {
+func compareNewOrderAndCacheOrder(correctItem []BxJSONStructure) {
+	if len(cacheAPI) == 0 {
 		splitTextBeforeSendToLine(firstReporter(correctItem))
 	} else {
 		splitTextBeforeSendToLine(compareDataFromAPIAndCache(correctItem))
 	}
 }
 
-func firstReporter(correctItem *BxJSONObject) []string {
+func firstReporter(correctItem []BxJSONStructure) []string {
 	var stringCollections []string
-	for _, bxItem := range *correctItem {
+	for _, bxItem := range correctItem {
 		var stringBuffer bytes.Buffer
 		stringBuffer.WriteString("\n")
 		stringBuffer.WriteString(bxItem.PrimaryCurrency +
@@ -87,7 +88,7 @@ func firstReporter(correctItem *BxJSONObject) []string {
 	return stringCollections
 }
 
-func compareDataFromAPIAndCache(correctItem *BxJSONObject) []string {
+func compareDataFromAPIAndCache(correctItem []BxJSONStructure) []string {
 	var compareResult = cacheDataAndAPIMapper(correctItem)
 	var stringCollections []string
 	for _, result := range compareResult {
@@ -108,10 +109,10 @@ func compareDataFromAPIAndCache(correctItem *BxJSONObject) []string {
 	return stringCollections
 }
 
-func cacheDataAndAPIMapper(correctItem *BxJSONObject) []DiffModel {
+func cacheDataAndAPIMapper(correctItem []BxJSONStructure) []DiffModel {
 	var compareResult = []DiffModel{}
-	for _, bxItem := range *correctItem {
-		for _, bxCacheItem := range *cacheAPI {
+	for _, bxItem := range correctItem {
+		for _, bxCacheItem := range cacheAPI {
 			if bxItem.PairingID == bxCacheItem.PairingID {
 				var resultItem = DiffModel{OldValue: bxCacheItem, NewValue: bxItem}
 				compareResult = append(compareResult, resultItem)
@@ -165,6 +166,29 @@ func readConfig() {
 	setDelay = config.Delay
 	bxAPI = config.BXAPIUrl
 	lineAccessToken = config.LineAccessToken
+	replaceLastData = config.ReplaceLastData
+}
+
+func replaceLowerData(correctItem []BxJSONStructure) []BxJSONStructure {
+	var tempCache = []BxJSONStructure{}
+	for _, bxItem := range correctItem {
+		for _, bxCacheItem := range cacheAPI {
+			if bxItem.PairingID == bxCacheItem.PairingID && bxCacheItem.LastPrice > bxItem.LastPrice {
+				tempCache = append(tempCache, bxItem)
+			} else if bxItem.PairingID == bxCacheItem.PairingID {
+				tempCache = append(tempCache, bxCacheItem)
+			}
+		}
+	}
+	return tempCache
+}
+
+func bxObjectConverter(correctItem *BxJSONObject) []BxJSONStructure {
+	var bxResult = []BxJSONStructure{}
+	for _, bxItem := range *correctItem {
+		bxResult = append(bxResult, bxItem)
+	}
+	return bxResult
 }
 
 func main() {
@@ -176,8 +200,13 @@ func main() {
 			log.Fatal(err)
 			fmt.Println(err.Error())
 		}
-		compareNewOrderAndCacheOrder(correctObj)
-		cacheAPI = correctObj
+		var bxFinalOpject = bxObjectConverter(correctObj)
+		compareNewOrderAndCacheOrder(bxFinalOpject)
+		if replaceLastData {
+			cacheAPI = bxFinalOpject
+		} else {
+			cacheAPI = replaceLowerData(bxFinalOpject)
+		}
 		time.Sleep(setDelay * 1000 * time.Millisecond)
 	}
 }

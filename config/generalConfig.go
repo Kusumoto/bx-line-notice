@@ -8,4 +8,5 @@ type GeneralConfig struct {
 	LineAccessToken string
 	HTTPTimeout     time.Duration
 	Delay           time.Duration
+	ReplaceLastData bool
 }
