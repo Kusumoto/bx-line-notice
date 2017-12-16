@@ -1,6 +1,8 @@
 # bx-line-notice
 Compare and notice price cryptocurrency from bx.in.th to line
 
+[![Docker Build Status](https://img.shields.io/docker/build/kusumoto/bx-line-notice.svg)](https://hub.docker.com/r/kusumoto/bx-line-notice/)
+
 ## How to use
 - Write the configuration file (config.json)
 ```json
