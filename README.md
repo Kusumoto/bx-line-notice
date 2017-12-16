@@ -1,5 +1,5 @@
 # bx-line-notice
-Compare and notice price cryptocurrency from bx.in.th
+Compare and notice price cryptocurrency from bx.in.th to line
 
 ## How to use
 - Write the configuration file (config.json)
