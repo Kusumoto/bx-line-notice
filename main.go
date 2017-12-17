@@ -67,7 +67,6 @@ func getJSON(url string, target interface{}) error {
 }
 
 func compareNewOrderAndCacheOrder(correctItem []BxJSONStructure) {
-	fmt.Println(len(*cacheAPI))
 	if len(*cacheAPI) == 0 {
 		splitTextBeforeSendToLine(firstReporter(correctItem))
 	} else {
